@@ -1,12 +1,22 @@
 package com.example.cs403_proj3;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -16,6 +26,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     ArrayList<Store> stores;
     ArrayList<StockedItem> masterList;
+    final int REQUEST_LOCATION_PERMISSION = 1;
+    private FusedLocationProviderClient fusedLocationClient;
+    double userLat, userLon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //add some random stores - just until API works.
-        //TODO Anthony feel free to delete this once you're done with your part
+        //TODO Anthony G feel free to delete this once you're done with the API
         stores = new ArrayList<>();
         Store meijer = new Store( "Meijer", findAddress(43.48273485750115, -83.9825981015855),43.48273485750115, -83.9825981015855);
         Store bestBuy = new Store("Best Buy",findAddress(43.472831468931524, -83.97255798905496), 43.472831468931524, -83.97255798905496);
@@ -44,12 +57,19 @@ public class MainActivity extends AppCompatActivity {
         masterList.add(new StockedItem(stapler, staples, 105, LocalDateTime.now()));
         masterList.add(new StockedItem(xboxx, bestBuy, 13, LocalDateTime.now()));
 
+
+        //checking permissions for using gps and get the location
+        //this can't be in the maps activity bc it doesn't execute in time
+        checkPermissions();
+        getUserLocation();
     }
 
     public void launchMaps(View v){
         Intent i = new Intent(this, MapsActivity.class);
         i.putExtra("stores", stores);
         i.putExtra("stock", masterList);
+        i.putExtra("userLat", userLat);
+        i.putExtra("userLon", userLon);
         startActivity(i);
     }
 
@@ -75,4 +95,46 @@ public class MainActivity extends AppCompatActivity {
         String knownName = addresses.get(0).getFeatureName();
         return address;
     }
+
+
+    private void getUserLocation() {
+        //GPS Stuff
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        //Gets last location from phone
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            //Set lat and lon values to the location lat and long
+                            userLat = location.getLatitude();
+                            userLon = location.getLongitude();
+                            Log.d("beata-debug", "Loc: "+userLat + " " + userLon);
+                        }
+                        else{
+                            Log.d("beata-debug", "Could not get location");
+                            //set to SVSU by default
+                            userLat = 43.513583032256754;
+                            userLon = -83.96106395172602;
+                        }
+                    }
+                });
+    }
+
+    private void checkPermissions() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("locdemo", "getLocation: permissions not granted");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+        } else {
+            Log.d("locdemo", "getLocation: permissions already granted");
+        }
+    }
+
 }
