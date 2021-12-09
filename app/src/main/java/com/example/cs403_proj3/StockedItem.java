@@ -1,8 +1,9 @@
 package com.example.cs403_proj3;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class StockedItem {
+public class StockedItem implements Serializable {
     Item item;
     Store store;
     int quantity;

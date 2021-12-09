@@ -15,12 +15,12 @@ public class StoreActivity extends AppCompatActivity {
 
         //this is where we'd show all of the stock of that store.
         //the maps activity will launch this screen
+        Store thisStore = (Store) getIntent().getSerializableExtra("store");
 
 
     }
 
     public void launchMap(View v){
-        Intent i = new Intent(this, MapsActivity.class);
-        startActivity(i);
+        finish();
     }
 }
