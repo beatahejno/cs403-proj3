@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import java.util.ArrayList;
+
 public class StoreActivity extends AppCompatActivity {
 
     @Override
@@ -15,12 +17,13 @@ public class StoreActivity extends AppCompatActivity {
 
         //this is where we'd show all of the stock of that store.
         //the maps activity will launch this screen
-
+        Store thisStore = (Store) getIntent().getSerializableExtra("store");
+        //this contains ALL stock, not only of this store
+        ArrayList<StockedItem> stock = (ArrayList<StockedItem>) getIntent().getSerializableExtra("stock");
 
     }
 
     public void launchMap(View v){
-        Intent i = new Intent(this, MapsActivity.class);
-        startActivity(i);
+        finish();
     }
 }

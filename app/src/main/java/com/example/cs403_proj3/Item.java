@@ -1,6 +1,8 @@
 package com.example.cs403_proj3;
 
-public class Item {
+import java.io.Serializable;
+
+public class Item implements Serializable {
     String name, description;
     double price;
 
