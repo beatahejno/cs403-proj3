@@ -24,7 +24,7 @@ public class ItemTemp extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_item_temp);
+        setContentView(R.layout.activity_item_page);
         lstItems = findViewById(R.id.lstItems);
         search = findViewById(R.id.txtItemSearch);
         adaptor = new ItemAdaptor(list);

@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
+import com.example.cs403_proj3.ItemPage;
 import com.example.cs403_proj3.R;
+import com.example.cs403_proj3.StorePage;
 
 /**
  * A [FragmentPagerAdapter] that returns a fragment corresponding to
@@ -27,9 +29,16 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
-        return PlaceholderFragment.newInstance(position + 1);
+        Fragment fragment = null;
+        switch(position) {
+            case 0: fragment = new ItemPage(); break;
+
+            case 1: fragment = new StorePage(); break;
+
+            // If adding more tabs: position = the index of the title
+        }
+
+        return fragment;
     }
 
     @Nullable

@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">cs403-proj3</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="title_activity_browser">Browser</string>
+    <string name="tab_text_1">ITEMS</string>
+    <string name="tab_text_2">STORES</string>
 </resources>

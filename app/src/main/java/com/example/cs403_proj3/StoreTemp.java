@@ -24,7 +24,7 @@ public class StoreTemp extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_store_temp);
+        setContentView(R.layout.activity_store_page);
         lstStores = findViewById(R.id.lstStores);
         search = findViewById(R.id.txtStoreSearch);
         list = new ArrayList<>();
