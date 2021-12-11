@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -29,13 +31,25 @@ public class MainActivity extends AppCompatActivity {
     final int REQUEST_LOCATION_PERMISSION = 1;
     private FusedLocationProviderClient fusedLocationClient;
     double userLat, userLon;
+    SharedPreferences sharedPref;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sharedPref=getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
 
+        //find if logged in, if not send to logout
+        if (sharedPref.getBoolean("login",false)) {
+            SharedPreferences.Editor prefEditor = sharedPref.edit();
+            prefEditor.putBoolean("login", false);
+            prefEditor.apply();
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
         //add some random stores - just until API works.
         //TODO Anthony G feel free to delete this once you're done with the API
         stores = new ArrayList<>();
@@ -127,6 +141,15 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    public void logout(View view) {
+        SharedPreferences.Editor prefEditor = sharedPref.edit();
+        prefEditor.putString("auth-token", "");
+        prefEditor.putBoolean("login", false);
+        prefEditor.apply();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 
     private void checkPermissions() {
