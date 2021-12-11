@@ -43,8 +43,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
-        String user = (String) this.txtUsername.getText();
-        String pw = (String) this.txtPassword.getText();
+        String user = this.txtUsername.getText().toString();
+        String pw = this.txtPassword.getText().toString();
         this.txtPassword.setText("");
         try {
             URL url = new URL(WEBSITE_URL_GET_AUTH);
@@ -67,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
                 SharedPreferences.Editor prefEditor = sharedPref.edit();
                 prefEditor.putString("auth-token", token);
                 prefEditor.apply();
+                Toast.makeText(getApplicationContext(),"login successful.",Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(this, MainActivity.class); //TODO: replace this with whatever activity you want it to go to.
                 startActivity(intent);
 
