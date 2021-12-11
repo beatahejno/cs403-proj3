@@ -6,8 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.text.Layout;
-import android.widget.Filter;
 import android.widget.SearchView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,7 +31,7 @@ public class MapFilterActivity extends AppCompatActivity {
     ArrayList<Item> unfilteredItems;
     ArrayList<Item> searchResults;
 
-    FilterAdapter adapter;
+    FilterAdapter filterAdapter;
     FilterAdapter searchAdapter;
 
     @Override
@@ -72,8 +70,8 @@ public class MapFilterActivity extends AppCompatActivity {
         unfilteredItems.add(new Item("GPU !0940", "", 1));
         searchResults.addAll(unfilteredItems);
 
-        adapter = new FilterAdapter( false);
-        rclFilteredItems.setAdapter(adapter);
+        filterAdapter = new FilterAdapter( false);
+        rclFilteredItems.setAdapter(filterAdapter);
         rclFilteredItems.setLayoutManager(new LinearLayoutManager(this));
 
         searchAdapter = new FilterAdapter( true);
@@ -106,6 +104,13 @@ public class MapFilterActivity extends AppCompatActivity {
                 searchResults.add(item);
         }
         searchAdapter.notifyDataSetChanged();
+    }
+
+    public void clearFilters(View v){
+        unfilteredItems.addAll(filteredItems);
+        filteredItems.clear();
+        filterAdapter.notifyDataSetChanged();
+        doSearch(filterSearch.getQuery().toString());
     }
 
     class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.FilterViewHolder> {
@@ -141,7 +146,7 @@ public class MapFilterActivity extends AppCompatActivity {
                     unfilteredItems.remove(result);
                     searchResults.remove(result);
                     this.notifyDataSetChanged();
-                    adapter.notifyDataSetChanged();
+                    filterAdapter.notifyDataSetChanged();
                 });
             } else {
                 item = filteredItems.get(position);
