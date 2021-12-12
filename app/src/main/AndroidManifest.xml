@@ -28,6 +28,10 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+            android:name=".Browser"
+            android:exported="false"
+            android:label="@string/title_activity_browser"
+            android:theme="@style/Theme.Cs403proj3.NoActionBar" />
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
@@ -46,6 +50,12 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <activity
+            android:name=".StoreTemp"
+            android:exported="false" />
+        <activity
+            android:name=".ItemTemp"
+            android:exported="false" />
         <activity
             android:name=".MapsActivity"
             android:exported="true"
