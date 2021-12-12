@@ -57,7 +57,7 @@ public class ItemPage extends Fragment {
         //TODO input items to list
         preferences = getContext().getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
         String token = preferences.getString("auth-token",null);
-        String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api";
+        String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api?auth-token="+token;
         fetchData(url,queue);
 
         display = new ArrayList<>();

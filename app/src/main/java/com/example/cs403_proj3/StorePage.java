@@ -1,5 +1,7 @@
 package com.example.cs403_proj3;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,9 +20,19 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class StorePage extends Fragment {
+    SharedPreferences preferences;
+    RequestQueue queue;
     RecyclerView lstStores;
     ArrayList<Store> display;
     ArrayList<Store> list;
@@ -39,6 +52,10 @@ public class StorePage extends Fragment {
         lstStores.setLayoutManager(layoutManager);
 
         //TODO fill list
+        preferences = getContext().getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
+        String token = preferences.getString("auth-token",null);
+        String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api?auth-token="+token;
+        fetchData(url,queue);
 
         display = new ArrayList<>();
         display.addAll(list);
@@ -71,6 +88,32 @@ public class StorePage extends Fragment {
         });
 
         return view;
+    }
+
+    private void fetchData(String url, RequestQueue queue) {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,url,null, response->{
+
+            try {
+                JSONArray results = response.getJSONArray("");
+                for(int i=0;i<results.length();i++){
+                    JSONObject obj = results.getJSONObject(i);
+
+                    String name = obj.getString("store_name");
+                    String address = obj.getString("address");
+                    double lat = obj.getDouble("lat");
+                    double lon = obj.getDouble("lon");
+                    Store p = new Store(name,address,lat,lon);
+                    list.add(p);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        },error->{
+            Toast.makeText(getContext(),"Could not get data...",Toast.LENGTH_LONG).show();
+        });
+
+        queue.add(request);
     }
 
     class StoreAdaptor extends RecyclerView.Adapter<StoreAdaptor.StoreHolder> {
