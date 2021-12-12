@@ -131,7 +131,7 @@ class LoginThread extends Thread {
                 JsonParser jsonParser = new JsonParser();
                 JsonElement el = jsonParser.parse(new InputStreamReader(in, "UTF-8"));
                 JsonObject jsob = el.getAsJsonObject();
-                String token = jsob.get("auth-token").getAsString();
+                String token = jsob.get("token").getAsString();
                 SharedPreferences.Editor prefEditor = sharedPref.edit();
                 prefEditor.putString("auth-token", token);
                 prefEditor.putBoolean("login", false);
