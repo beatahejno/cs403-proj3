@@ -55,9 +55,9 @@ public class ItemPage extends Fragment {
         queue = Volley.newRequestQueue(view.getContext());
 
         //TODO input items to list
-        preferences = getContext().getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
-        String token = preferences.getString("auth-token",null);
-        String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api?auth-token="+token;
+        //preferences = getContext().getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
+        //String token = preferences.getString("auth-token",null);
+        String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api";
         fetchData(url,queue);
 
         display = new ArrayList<>();
