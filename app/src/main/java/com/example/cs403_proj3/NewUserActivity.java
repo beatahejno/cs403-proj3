@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +47,11 @@ public class NewUserActivity extends AppCompatActivity {
         }
         NewUserThread nut = new NewUserThread(user, pass);
         nut.setAppContext(getApplicationContext());
+        nut.start();
+        while(nut.returnCode==-1) {
+            Log.d("Response code", "trying not to die");
+        }
+        nut.interrupt();
         if (nut.getReturnCode()==201) {
             Toast.makeText(getApplicationContext(), "User successfully created. Please log in.", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class); //TODO: replace this with whatever activity you want it to go to.
@@ -98,7 +104,7 @@ class NewUserThread extends Thread {
             out.writeBytes(ParameterStringBuilder.getParamsString(params));
             out.flush();
             out.close();
-
+            Log.d("Response code", ""+con.getResponseCode());
             if (con.getResponseCode() == 201) {
                this.returnCode=201;
             } else if (con.getResponseCode() == 400) {
