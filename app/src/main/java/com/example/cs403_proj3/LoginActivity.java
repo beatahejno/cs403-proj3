@@ -135,7 +135,7 @@ class LoginThread extends Thread {
                 SharedPreferences.Editor prefEditor = sharedPref.edit();
                 prefEditor.putString("auth-token", token);
                 prefEditor.putBoolean("login", false);
-                prefEditor.apply();
+                prefEditor.commit();
                 this.returnCode=200;
             } else if (con.getResponseCode() == 400) {
                 this.returnCode=400;

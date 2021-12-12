@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor prefEditor = sharedPref.edit();
         prefEditor.putString("auth-token", "");
         prefEditor.putBoolean("login", false);
-        prefEditor.apply();
+        prefEditor.commit();
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
