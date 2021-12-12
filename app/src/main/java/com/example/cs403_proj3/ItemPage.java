@@ -1,6 +1,8 @@
 package com.example.cs403_proj3;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,10 +26,15 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 
 public class ItemPage extends Fragment {
+    SharedPreferences preferences;
     RequestQueue queue;
     RecyclerView lstItems;
     ArrayList<Item> list;
@@ -46,10 +54,11 @@ public class ItemPage extends Fragment {
         lstItems.setLayoutManager(layoutManager);
         queue = Volley.newRequestQueue(view.getContext());
 
-
         //TODO input items to list
+        preferences = getContext().getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
+        String token = preferences.getString("auth-token",null);
         String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api";
-
+        fetchData(url,queue);
 
         display = new ArrayList<>();
         display.addAll(list);
@@ -84,6 +93,31 @@ public class ItemPage extends Fragment {
 
 
         return view;
+    }
+
+    private void fetchData(String url, RequestQueue queue) {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,url,null,response->{
+
+            try {
+                JSONArray results = response.getJSONArray("");
+                for(int i=0;i<results.length();i++){
+                    JSONObject obj = results.getJSONObject(i);
+
+                    String name = obj.getString("item_name");
+                    String desc = obj.getString("item_description");
+                    double price = obj.getDouble("item_price");
+                    Item p = new Item(name,desc,price);
+                    list.add(p);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        },error->{
+            Toast.makeText(getContext(),"Could not get data...",Toast.LENGTH_LONG).show();
+        });
+
+        queue.add(request);
     }
 
     class ItemAdaptor extends RecyclerView.Adapter<ItemAdaptor.ItemHolder> {
