@@ -43,6 +43,12 @@ public class LoginActivity extends AppCompatActivity {
         this.sharedPref = getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
     }
 
+    public void newUser(View view) {
+        Intent intent = new Intent(getApplicationContext(), NewUserActivity.class); //DONE: replace this with whatever activity you want it to go to.
+        startActivity(intent);
+        finish();
+    }
+
     public void login(View view) {
         String user = this.txtUsername.getText().toString();
         String pw = this.txtPassword.getText().toString();
@@ -57,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         loginThread.interrupt();
         if (loginThread.getReturnCode()==200) {
             Toast.makeText(getApplicationContext(), "login successful.", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class); //TODO: replace this with whatever activity you want it to go to.
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class); //DONE: replace this with whatever activity you want it to go to.
             startActivity(intent);
 
         }
@@ -134,7 +140,7 @@ class LoginThread extends Thread {
                 String token = jsob.get("token").getAsString();
                 SharedPreferences.Editor prefEditor = sharedPref.edit();
                 prefEditor.putString("auth-token", token);
-                prefEditor.putBoolean("login", false);
+                prefEditor.putBoolean("login", true);
                 prefEditor.commit();
                 this.returnCode=200;
             } else if (con.getResponseCode() == 400) {
