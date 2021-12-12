@@ -18,22 +18,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cs403proj3">
         <activity
-            android:name=".LoginActivity"
+            android:name=".NewUserActivity"
             android:exported="false" />
         <activity
-            android:name=".NewUserActivity"
+            android:name=".LoginActivity"
             android:exported="false" />
         <activity
             android:name=".MapFilterActivity"
             android:launchMode="singleTop"
-            android:exported="true">
+            android:exported="true"/>
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
-        </activity>
         <activity
             android:name=".Browser"
             android:exported="false"
