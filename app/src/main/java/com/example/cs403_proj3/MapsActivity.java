@@ -100,4 +100,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
     }
+
+    public void launchFilter(View v) {
+        startActivity(new Intent(this, MapFilterActivity.class));
+    }
 }
