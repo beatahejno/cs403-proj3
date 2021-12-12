@@ -18,6 +18,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cs403proj3">
         <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
             android:name=".MapFilterActivity"
             android:launchMode="singleTop"
             android:exported="true">
