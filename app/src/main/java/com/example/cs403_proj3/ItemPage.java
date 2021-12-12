@@ -2,6 +2,8 @@ package com.example.cs403_proj3;
 
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +18,19 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
 import java.util.ArrayList;
 
 
 public class ItemPage extends Fragment {
+    RequestQueue queue;
     RecyclerView lstItems;
     ArrayList<Item> list;
+    ArrayList<Item> display;
     ItemAdaptor adaptor;
     EditText search;
 
@@ -31,11 +40,20 @@ public class ItemPage extends Fragment {
         View view = inflater.inflate(R.layout.activity_item_page,container,false);
         lstItems = view.findViewById(R.id.lstItems);
         search = view.findViewById(R.id.txtItemSearch);
-        adaptor = new ItemAdaptor(list);
+        adaptor = new ItemAdaptor(display);
         lstItems.setAdapter(adaptor);
         LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         lstItems.setLayoutManager(layoutManager);
+        queue = Volley.newRequestQueue(view.getContext());
 
+
+        //TODO input items to list
+        String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api";
+
+
+        display = new ArrayList<>();
+        display.addAll(list);
+        adaptor.notifyItemRangeInserted(0,display.size());
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN,ItemTouchHelper.RIGHT) {
             @Override
@@ -47,6 +65,22 @@ public class ItemPage extends Fragment {
 
             }
         }); itemTouchHelper.attachToRecyclerView(lstItems);
+
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void afterTextChanged(Editable editable) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                display = new ArrayList<>();
+                for(Item item: list) {
+                    if(item.name.contains(charSequence)) display.add(item);
+                    else if(item.description.contains(charSequence)) display.add(item);
+                } adaptor.notifyDataSetChanged();
+            }
+        });
 
 
         return view;

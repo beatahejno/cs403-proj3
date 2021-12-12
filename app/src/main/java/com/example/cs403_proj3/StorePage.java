@@ -1,6 +1,8 @@
 package com.example.cs403_proj3;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 
 public class StorePage extends Fragment {
     RecyclerView lstStores;
+    ArrayList<Store> display;
     ArrayList<Store> list;
     StoreAdaptor adaptor;
     EditText search;
@@ -35,6 +38,11 @@ public class StorePage extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         lstStores.setLayoutManager(layoutManager);
 
+        //TODO fill list
+
+        display = new ArrayList<>();
+        display.addAll(list);
+        adaptor.notifyItemRangeInserted(0,display.size());
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN,ItemTouchHelper.RIGHT) {
             @Override
@@ -47,6 +55,20 @@ public class StorePage extends Fragment {
             }
         }); itemTouchHelper.attachToRecyclerView(lstStores);
 
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void afterTextChanged(Editable editable) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                display = new ArrayList<>();
+                for(Store store: list) {
+                    if(store.name.contains(charSequence)) display.add(store);
+                } adaptor.notifyDataSetChanged();
+            }
+        });
 
         return view;
     }
