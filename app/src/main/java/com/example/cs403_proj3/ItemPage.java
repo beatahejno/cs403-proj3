@@ -139,6 +139,9 @@ public class ItemPage extends Fragment {
             holder.name.setText(i.name);
             holder.desc.setText(i.description);
             holder.price.setText("$" + i.price);
+            holder.select.setOnClickListener(view -> {
+                //TODO Expanded Item layout to search for stores
+            });
         }
 
         @Override
@@ -160,9 +163,7 @@ public class ItemPage extends Fragment {
                 price = itemView.findViewById(R.id.txtItemPrice);
                 amount = itemView.findViewById(R.id.txtItemAmount);
                 select = itemView.findViewById(R.id.btnItemSelect);
-                select.setOnClickListener(view -> {
-                    //TODO Expanded Item layout to search for stores
-                });
+
             }
         }
     }

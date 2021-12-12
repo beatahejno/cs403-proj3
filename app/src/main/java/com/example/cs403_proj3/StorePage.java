@@ -1,6 +1,7 @@
 package com.example.cs403_proj3;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
@@ -103,6 +104,7 @@ public class StorePage extends Fragment {
                     double lat = obj.getDouble("lat");
                     double lon = obj.getDouble("lon");
                     Store p = new Store(name,address,lat,lon);
+
                     list.add(p);
                 }
 
@@ -133,7 +135,16 @@ public class StorePage extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull StoreHolder holder, int position) {
             Store s = stores.get(position);
-
+            holder.name.setText(s.name);
+            holder.address.setText(s.address);
+            holder.location.setText("Lat: " + s.lat + " Long: " + s.lon);
+            holder.select.setOnClickListener(view -> {
+                //TODO Call Map to store location
+                Intent i = new Intent(getContext(),MapsActivity.class);
+                i.putExtra("userLat",s.lat);
+                i.putExtra("userLon",s.lon);
+                startActivity(i);
+            });
         }
 
         @Override
@@ -153,9 +164,7 @@ public class StorePage extends Fragment {
                 address = itemView.findViewById(R.id.txtStoreAddress);
                 location = itemView.findViewById(R.id.txtStoreLoc);
                 select = itemView.findViewById(R.id.btnLocateStore);
-                select.setOnClickListener(view -> {
-                    //TODO Call Map to store location
-                });
+
             }
         }
     }
