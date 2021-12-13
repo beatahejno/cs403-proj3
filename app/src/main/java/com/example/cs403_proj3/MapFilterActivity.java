@@ -6,8 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.text.Layout;
-import android.widget.Filter;
 import android.widget.SearchView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,6 +19,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 
 public class MapFilterActivity extends AppCompatActivity {
@@ -33,8 +34,13 @@ public class MapFilterActivity extends AppCompatActivity {
     ArrayList<Item> unfilteredItems;
     ArrayList<Item> searchResults;
 
-    FilterAdapter adapter;
+    FilterAdapter filterAdapter;
     FilterAdapter searchAdapter;
+
+    double userLat, userLon;
+    ArrayList<Store> stores;
+    ArrayList<StockedItem> masterList;
+    HashMap<Integer, Item> items;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,14 +72,12 @@ public class MapFilterActivity extends AppCompatActivity {
 
         filteredItems = new ArrayList<>();
         unfilteredItems = new ArrayList<>();
+        unfilteredItems.addAll(items.values());
         searchResults = new ArrayList<>();
-        filteredItems.add(new Item("TestItem", "", 1));
-        unfilteredItems.add(new Item("a", "", 1));
-        unfilteredItems.add(new Item("GPU !0940", "", 1));
         searchResults.addAll(unfilteredItems);
 
-        adapter = new FilterAdapter( false);
-        rclFilteredItems.setAdapter(adapter);
+        filterAdapter = new FilterAdapter( false);
+        rclFilteredItems.setAdapter(filterAdapter);
         rclFilteredItems.setLayoutManager(new LinearLayoutManager(this));
 
         searchAdapter = new FilterAdapter( true);
@@ -94,6 +98,12 @@ public class MapFilterActivity extends AppCompatActivity {
                 doSearch(intent.getStringExtra(SearchManager.QUERY));
 
             }
+        } else {
+            stores = (ArrayList<Store>) getIntent().getSerializableExtra("stores");
+            masterList = (ArrayList<StockedItem>) getIntent().getSerializableExtra("stock");
+            items = (HashMap<Integer, Item>) getIntent().getSerializableExtra("items");
+            userLat = getIntent().getDoubleExtra("userLat", 0.0);
+            userLon = getIntent().getDoubleExtra("userLon", 0.0);
         }
     }
 
@@ -106,6 +116,43 @@ public class MapFilterActivity extends AppCompatActivity {
                 searchResults.add(item);
         }
         searchAdapter.notifyDataSetChanged();
+    }
+
+    public void clearFilters(View v){
+        unfilteredItems.addAll(items.values());
+        filteredItems.clear();
+        filterAdapter.notifyDataSetChanged();
+        doSearch(filterSearch.getQuery().toString());
+    }
+
+    public void filter(View v){
+        if(filteredItems.size() == 0) {
+            for (Store store : stores) {
+                store.filtered = true;
+            }
+        }else{
+            LinkedHashMap<Integer, Store> filteredStores = new LinkedHashMap<>();
+            for (StockedItem stockedItem : masterList) {
+                if (filteredItems.contains(stockedItem.item)) {
+                    filteredStores.put(stockedItem.store.id, stockedItem.store);
+                }
+            }
+            for (Store store : stores) {
+                if (filteredStores.containsKey(store.id)) {
+                    store.filtered = true;
+                } else {
+                    store.filtered = false;
+                }
+            }
+        }
+
+        Intent i = new Intent(this, MapsActivity.class);
+        i.putExtra("stores", stores);
+        i.putExtra("stock", masterList);
+        i.putExtra("userLat", userLat);
+        i.putExtra("userLon", userLon);
+        i.putExtra("items", items);
+        startActivity(i);
     }
 
     class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.FilterViewHolder> {
@@ -141,7 +188,7 @@ public class MapFilterActivity extends AppCompatActivity {
                     unfilteredItems.remove(result);
                     searchResults.remove(result);
                     this.notifyDataSetChanged();
-                    adapter.notifyDataSetChanged();
+                    filterAdapter.notifyDataSetChanged();
                 });
             } else {
                 item = filteredItems.get(position);
