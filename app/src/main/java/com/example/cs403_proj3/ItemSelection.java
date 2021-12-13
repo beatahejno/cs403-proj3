@@ -28,7 +28,7 @@ import java.util.ArrayList;
 public class ItemSelection extends AppCompatActivity {
     Item item;
     RequestQueue queue;
-    ListView lstItems;
+    RecyclerView lstItems;
     ArrayList<Store> list;
     ItemStoreAdaptor adaptor;
     TextView name;
@@ -48,6 +48,7 @@ public class ItemSelection extends AppCompatActivity {
         lstItems = findViewById(R.id.lstItemStores);
         list = new ArrayList<>();
         adaptor = new ItemStoreAdaptor(list);
+        lstItems.setAdapter(adaptor);
         String url = "https://fast-ocean-54669.herokuapp.com/item_stock/?format=api";
         queue = Volley.newRequestQueue(this);
         fetchData(url,queue);
