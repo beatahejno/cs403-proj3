@@ -2,6 +2,7 @@ package com.example.cs403_proj3;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
@@ -54,10 +55,10 @@ public class ItemPage extends Fragment {
         lstItems.setLayoutManager(layoutManager);
         queue = Volley.newRequestQueue(view.getContext());
 
-        //TODO input items to list
         //preferences = getContext().getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
         //String token = preferences.getString("auth-token",null);
         String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api";
+        queue = Volley.newRequestQueue(getContext());
         fetchData(url,queue);
 
         display = new ArrayList<>();
@@ -137,10 +138,11 @@ public class ItemPage extends Fragment {
         public void onBindViewHolder(@NonNull ItemHolder holder, int position) {
             Item i = items.get(position);
             holder.name.setText(i.name);
-            holder.desc.setText(i.description);
             holder.price.setText("$" + i.price);
             holder.select.setOnClickListener(view -> {
-                //TODO Expanded Item layout to search for stores
+                Intent intent = new Intent(getContext(),ItemSelection.class);
+                intent.putExtra("selected", i);
+                startActivity(intent);
             });
         }
 
@@ -151,7 +153,6 @@ public class ItemPage extends Fragment {
 
         class ItemHolder extends RecyclerView.ViewHolder {
             TextView name;
-            TextView desc;
             TextView price;
             TextView amount;
             Button select;
@@ -159,11 +160,9 @@ public class ItemPage extends Fragment {
             public ItemHolder(@NonNull View itemView) {
                 super(itemView);
                 name = itemView.findViewById(R.id.txtItemName);
-                desc = itemView.findViewById(R.id.txtItemDesc);
                 price = itemView.findViewById(R.id.txtItemPrice);
                 amount = itemView.findViewById(R.id.txtItemAmount);
                 select = itemView.findViewById(R.id.btnItemSelect);
-
             }
         }
     }

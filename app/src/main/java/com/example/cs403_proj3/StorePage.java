@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,10 +53,10 @@ public class StorePage extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         lstStores.setLayoutManager(layoutManager);
 
-        //TODO fill list
         //preferences = getContext().getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
         //String token = preferences.getString("auth-token",null);
         String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api";
+        queue = Volley.newRequestQueue(getContext());
         fetchData(url,queue);
 
         display = new ArrayList<>();
@@ -139,7 +140,6 @@ public class StorePage extends Fragment {
             holder.address.setText(s.address);
             holder.location.setText("Lat: " + s.lat + " Long: " + s.lon);
             holder.select.setOnClickListener(view -> {
-                //TODO Call Map to store location
                 Intent i = new Intent(getContext(),MapsActivity.class);
                 i.putExtra("userLat",s.lat);
                 i.putExtra("userLon",s.lon);
@@ -164,7 +164,6 @@ public class StorePage extends Fragment {
                 address = itemView.findViewById(R.id.txtStoreAddress);
                 location = itemView.findViewById(R.id.txtStoreLoc);
                 select = itemView.findViewById(R.id.btnLocateStore);
-
             }
         }
     }

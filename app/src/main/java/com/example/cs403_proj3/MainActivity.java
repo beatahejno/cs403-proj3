@@ -158,4 +158,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void launchList() {
+        Intent i = new Intent(this,Browser.class);
+        startActivity(i);
+    }
+
 }
