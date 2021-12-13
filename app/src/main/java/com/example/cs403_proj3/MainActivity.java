@@ -40,12 +40,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sharedPref=getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
-
+        Log.d("debugging login", ""+sharedPref.getBoolean("login",false));
         //find if logged in, if not send to logout
-        if (sharedPref.getBoolean("login",false)) {
-            SharedPreferences.Editor prefEditor = sharedPref.edit();
-            prefEditor.putBoolean("login", false);
-            prefEditor.apply();
+        if (!sharedPref.getBoolean("login",false)) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
