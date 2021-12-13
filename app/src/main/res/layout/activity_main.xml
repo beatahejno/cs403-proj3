@@ -23,8 +23,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="launchMaps"
-        android:text="Go"
-        app:layout_constraintBottom_toTopOf="@+id/tnAdStore"
+        android:text="Map"
+        app:layout_constraintBottom_toTopOf="@+id/btnLogOut"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,22 +32,9 @@
         app:layout_constraintVertical_chainStyle="packed" />
 
     <Button
-        android:id="@+id/tnAdStore"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="add store"
-        app:layout_constraintBottom_toTopOf="@+id/btnLogOut"
-        app:layout_constraintEnd_toEndOf="@+id/btnMaps"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/btnMaps"
-        app:layout_constraintTop_toBottomOf="@+id/btnMaps" />
-
-    <Button
         android:id="@+id/btnLogOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:backgroundTint="#E91E63"
         android:onClick="logout"
         android:text="log out"
@@ -55,7 +42,7 @@
         app:layout_constraintEnd_toEndOf="@+id/btnMaps"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/btnMaps"
-        app:layout_constraintTop_toBottomOf="@+id/tnAdStore" />
+        app:layout_constraintTop_toBottomOf="@+id/btnMaps" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -75,8 +62,8 @@
         android:onClick="launchList"
         android:text="List"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/tnAdStore"
-        app:layout_constraintStart_toStartOf="@+id/tnAdStore"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnLogOut" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
