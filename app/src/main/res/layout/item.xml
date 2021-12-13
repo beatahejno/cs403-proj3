@@ -16,16 +16,6 @@
         app:layout_constraintTop_toTopOf="@+id/imgItemDisplay" />
 
     <TextView
-        android:id="@+id/txtItemDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/imgItemDisplay"
-        app:layout_constraintStart_toEndOf="@+id/imgItemDisplay"
-        app:layout_constraintTop_toBottomOf="@+id/txtItemName" />
-
-    <TextView
         android:id="@+id/txtItemPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,7 +29,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="TextView"
         app:layout_constraintEnd_toEndOf="@+id/txtItemPrice"
         app:layout_constraintStart_toStartOf="@+id/txtItemPrice"
         app:layout_constraintTop_toBottomOf="@+id/txtItemPrice" />
@@ -64,5 +53,5 @@
         android:text="Find"
         app:layout_constraintBottom_toBottomOf="@+id/imgItemDisplay"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/txtItemDesc" />
+        app:layout_constraintStart_toEndOf="@+id/imgItemDisplay" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -264,4 +264,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void launchList(View v) {
+        Intent i = new Intent(this,Browser.class);
+        startActivity(i);
+    }
+
 }

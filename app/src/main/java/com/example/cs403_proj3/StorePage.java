@@ -1,6 +1,7 @@
 package com.example.cs403_proj3;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
@@ -22,7 +23,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,15 +54,14 @@ public class StorePage extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         lstStores.setLayoutManager(layoutManager);
 
-        //TODO fill list
         //preferences = getContext().getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
         //String token = preferences.getString("auth-token",null);
-        String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api";
+        String url = "https://fast-ocean-54669.herokuapp.com/stores/";
+        queue = Volley.newRequestQueue(getContext());
         fetchData(url,queue);
 
         display = new ArrayList<>();
-        display.addAll(list);
-        adaptor.notifyItemRangeInserted(0,display.size());
+
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN,ItemTouchHelper.RIGHT) {
             @Override
@@ -91,21 +93,22 @@ public class StorePage extends Fragment {
     }
 
     private void fetchData(String url, RequestQueue queue) {
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,url,null, response->{
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,url,null, response->{
 
             try {
-                JSONArray results = response.getJSONArray("");
-                for(int i=0;i<results.length();i++){
-                    JSONObject obj = results.getJSONObject(i);
+                for(int i=0;i<response.length();i++){
+                    JSONObject obj = response.getJSONObject(i);
 
                     String name = obj.getString("store_name");
                     String address = obj.getString("address");
                     double lat = obj.getDouble("lat");
                     double lon = obj.getDouble("lon");
                     Store p = new Store(name,address,lat,lon);
+
                     list.add(p);
                 }
-
+                display.addAll(list);
+                adaptor.notifyItemRangeInserted(0,display.size());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -126,14 +129,23 @@ public class StorePage extends Fragment {
         @NonNull
         @Override
         public StoreHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item,parent,false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.store,parent,false);
             return new StoreHolder(v);
         }
 
         @Override
         public void onBindViewHolder(@NonNull StoreHolder holder, int position) {
             Store s = stores.get(position);
-
+            holder.name.setText(s.name);
+            holder.address.setText(s.address);
+            holder.location.setText("Lat: " + s.lat + " Long: " + s.lon);
+            holder.select.setOnClickListener(view -> {
+                Intent i = new Intent(getContext(),MapsActivity.class);
+                i.putExtra("userLat",s.lat);
+                i.putExtra("userLon",s.lon);
+                i.putExtra("stores", stores);
+                startActivity(i);
+            });
         }
 
         @Override
@@ -153,9 +165,6 @@ public class StorePage extends Fragment {
                 address = itemView.findViewById(R.id.txtStoreAddress);
                 location = itemView.findViewById(R.id.txtStoreLoc);
                 select = itemView.findViewById(R.id.btnLocateStore);
-                select.setOnClickListener(view -> {
-                    //TODO Call Map to store location
-                });
             }
         }
     }
