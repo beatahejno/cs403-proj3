@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -33,6 +34,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double userLat, userLon;
     ArrayList<Store> stores;
     ArrayList<StockedItem> masterList;
+    HashMap<Integer, Item> items;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         masterList = (ArrayList<StockedItem>) getIntent().getSerializableExtra("stock");
         userLat = getIntent().getDoubleExtra("userLat", 0.0);
         userLon = getIntent().getDoubleExtra("userLon", 0.0);
+        items = (HashMap<Integer, Item>) getIntent().getSerializableExtra("items");
     }
 
     @Override
@@ -72,12 +75,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add a marker for each store we have
         for (Store store : stores) {
-            LatLng storeCoordinates = new LatLng(store.lat, store.lon);
-            Marker storeMarker = mMap.addMarker(new MarkerOptions().position(storeCoordinates).title(store.name));
-            storeMarker.setSnippet(store.address);
-            storeMarker.setInfoWindowAnchor(0.5f, 0.5f);
-            //associate this marker with that store object
-            storeMarker.setTag(store);
+            if(store.filtered) {
+                LatLng storeCoordinates = new LatLng(store.lat, store.lon);
+                Marker storeMarker = mMap.addMarker(new MarkerOptions().position(storeCoordinates).title(store.name));
+                storeMarker.setSnippet(store.address);
+                storeMarker.setInfoWindowAnchor(0.5f, 0.5f);
+                //associate this marker with that store object
+                storeMarker.setTag(store);
+            }
         }
 
         //go to the selected store upon clicking the marker's title
@@ -102,6 +107,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void launchFilter(View v) {
-        startActivity(new Intent(this, MapFilterActivity.class));
+        Intent i = new Intent(this, MapFilterActivity.class);
+        i.putExtra("stores", stores);
+        i.putExtra("stock", masterList);
+        i.putExtra("userLat", userLat);
+        i.putExtra("userLon", userLon);
+        i.putExtra("items", items);
+        startActivity(i);
     }
 }
