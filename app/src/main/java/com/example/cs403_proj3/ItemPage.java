@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -49,21 +50,24 @@ public class ItemPage extends Fragment {
         View view = inflater.inflate(R.layout.activity_item_page,container,false);
         lstItems = view.findViewById(R.id.lstItems);
         search = view.findViewById(R.id.txtItemSearch);
-        adaptor = new ItemAdaptor(display);
-        lstItems.setAdapter(adaptor);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
-        lstItems.setLayoutManager(layoutManager);
+
         queue = Volley.newRequestQueue(view.getContext());
 
         //preferences = getContext().getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
         //String token = preferences.getString("auth-token",null);
-        String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api";
+        String url = "https://fast-ocean-54669.herokuapp.com/items/";
         queue = Volley.newRequestQueue(getContext());
         fetchData(url,queue);
 
         display = new ArrayList<>();
-        display.addAll(list);
-        adaptor.notifyItemRangeInserted(0,display.size());
+        list = new ArrayList<>();
+
+        adaptor = new ItemAdaptor(display);
+        lstItems.setAdapter(adaptor);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(view.getContext());
+        lstItems.setLayoutManager(layoutManager);
+
+
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN,ItemTouchHelper.RIGHT) {
             @Override
@@ -97,12 +101,11 @@ public class ItemPage extends Fragment {
     }
 
     private void fetchData(String url, RequestQueue queue) {
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,url,null,response->{
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,url,null, response->{
 
             try {
-                JSONArray results = response.getJSONArray("");
-                for(int i=0;i<results.length();i++){
-                    JSONObject obj = results.getJSONObject(i);
+                for(int i=0;i<response.length();i++){
+                    JSONObject obj = response.getJSONObject(i);
 
                     String name = obj.getString("item_name");
                     String desc = obj.getString("item_description");
@@ -110,7 +113,9 @@ public class ItemPage extends Fragment {
                     Item p = new Item(name,desc,price);
                     list.add(p);
                 }
+                display.addAll(list);
 
+                adaptor.notifyItemRangeInserted(0,display.size());
             } catch (JSONException e) {
                 e.printStackTrace();
             }

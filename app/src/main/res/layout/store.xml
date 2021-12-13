@@ -27,18 +27,19 @@
         android:layout_marginBottom="16dp"
         android:text="TextView"
         android:textStyle="italic"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/txtStoreLoc"
         app:layout_constraintStart_toStartOf="@+id/txtStoreName"
         app:layout_constraintTop_toBottomOf="@+id/txtStoreName" />
 
     <TextView
         android:id="@+id/txtStoreLoc"
-        android:layout_width="wrap_content"
+        android:layout_width="58dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:text="TextView"
-        app:layout_constraintBaseline_toBaselineOf="@+id/txtStoreAddress"
-        app:layout_constraintEnd_toEndOf="@+id/btnLocateStore"
-        app:layout_constraintStart_toStartOf="@+id/btnLocateStore" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/txtStoreAddress"
+        app:layout_constraintTop_toBottomOf="@+id/txtStoreAddress" />
 
     <Button
         android:id="@+id/btnLocateStore"
@@ -47,6 +48,5 @@
         android:layout_marginEnd="24dp"
         android:text="Go To"
         app:layout_constraintBaseline_toBaselineOf="@+id/txtStoreName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/txtStoreName" />
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

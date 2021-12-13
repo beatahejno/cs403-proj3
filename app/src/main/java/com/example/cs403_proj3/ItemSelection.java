@@ -2,6 +2,7 @@ package com.example.cs403_proj3;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -49,20 +51,20 @@ public class ItemSelection extends AppCompatActivity {
         list = new ArrayList<>();
         adaptor = new ItemStoreAdaptor(list);
         lstItems.setAdapter(adaptor);
-        String url = "https://fast-ocean-54669.herokuapp.com/item_stock/?format=api";
+        lstItems.setLayoutManager(new LinearLayoutManager(this));
+        String url = "https://fast-ocean-54669.herokuapp.com/item_stock/";
         queue = Volley.newRequestQueue(this);
         fetchData(url,queue);
     }
 
     private void fetchData(String url, RequestQueue queue) {
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,url,null, response->{
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,url,null, response->{
 
             try {
-                JSONArray results = response.getJSONArray("");
-                for(int i=0;i<results.length();i++){
-                    JSONObject obj = results.getJSONObject(i);
+                for(int i=0;i<response.length();i++){
+                    JSONObject obj = response.getJSONObject(i);
 
-                    if(item.name.equals(obj.getJSONObject("item").getString("name"))) {
+                    if(item.name.equals(obj.getJSONObject("item").getString("item_name"))) {
                         String storeName = obj.getJSONObject("store").getString("store_name");
                         String storeAddress = obj.getJSONObject("store").getString("address");
                         double storeLat = obj.getJSONObject("store").getDouble("lat");
@@ -92,7 +94,7 @@ public class ItemSelection extends AppCompatActivity {
         @NonNull
         @Override
         public StoreHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item,parent,false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.store,parent,false);
             return new StoreHolder(v);
         }
 
@@ -106,6 +108,9 @@ public class ItemSelection extends AppCompatActivity {
                 Intent i = new Intent(getBaseContext(),MapsActivity.class);
                 i.putExtra("userLat",s.lat);
                 i.putExtra("userLon",s.lon);
+                ArrayList<Store> l= new ArrayList<>();
+                l.add(s);
+                i.putExtra("stores",l );
                 startActivity(i);
             });
         }

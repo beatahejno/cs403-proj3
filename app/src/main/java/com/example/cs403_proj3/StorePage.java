@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -55,13 +56,12 @@ public class StorePage extends Fragment {
 
         //preferences = getContext().getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
         //String token = preferences.getString("auth-token",null);
-        String url = "https://fast-ocean-54669.herokuapp.com/items/?format=api";
+        String url = "https://fast-ocean-54669.herokuapp.com/stores/";
         queue = Volley.newRequestQueue(getContext());
         fetchData(url,queue);
 
         display = new ArrayList<>();
-        display.addAll(list);
-        adaptor.notifyItemRangeInserted(0,display.size());
+
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN,ItemTouchHelper.RIGHT) {
             @Override
@@ -93,12 +93,11 @@ public class StorePage extends Fragment {
     }
 
     private void fetchData(String url, RequestQueue queue) {
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,url,null, response->{
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET,url,null, response->{
 
             try {
-                JSONArray results = response.getJSONArray("");
-                for(int i=0;i<results.length();i++){
-                    JSONObject obj = results.getJSONObject(i);
+                for(int i=0;i<response.length();i++){
+                    JSONObject obj = response.getJSONObject(i);
 
                     String name = obj.getString("store_name");
                     String address = obj.getString("address");
@@ -108,7 +107,8 @@ public class StorePage extends Fragment {
 
                     list.add(p);
                 }
-
+                display.addAll(list);
+                adaptor.notifyItemRangeInserted(0,display.size());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -129,7 +129,7 @@ public class StorePage extends Fragment {
         @NonNull
         @Override
         public StoreHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item,parent,false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.store,parent,false);
             return new StoreHolder(v);
         }
 
@@ -143,6 +143,7 @@ public class StorePage extends Fragment {
                 Intent i = new Intent(getContext(),MapsActivity.class);
                 i.putExtra("userLat",s.lat);
                 i.putExtra("userLon",s.lon);
+                i.putExtra("stores", stores);
                 startActivity(i);
             });
         }
