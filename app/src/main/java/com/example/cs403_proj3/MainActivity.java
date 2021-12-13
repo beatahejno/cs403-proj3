@@ -1,8 +1,5 @@
 package com.example.cs403_proj3;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -14,61 +11,170 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.gson.JsonArray;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    ArrayList<Store> stores;
-    ArrayList<StockedItem> masterList;
+    volatile ArrayList<Store> stores;
+    volatile ArrayList<StockedItem> masterList;
+    volatile HashMap<Integer, Item> items;
     final int REQUEST_LOCATION_PERMISSION = 1;
     private FusedLocationProviderClient fusedLocationClient;
     double userLat, userLon;
     SharedPreferences sharedPref;
-
+    volatile static JSONObject response;
+    TextView txtWelcome ;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sharedPref=getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
-        Log.d("debugging login", ""+sharedPref.getBoolean("login",false));
+
+        txtWelcome = findViewById(R.id.txtWelcome);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
         //find if logged in, if not send to logout
         if (!sharedPref.getBoolean("login",false)) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
+        }else{
+            txtWelcome.setText("Welcome " + sharedPref.getString("username", ""));
         }
         //add some random stores - just until API works.
         //TODO Anthony G feel free to delete this once you're done with the API
+
+        SharedPreferences sharedPreferences = getSharedPreferences("LOGIN_APP", Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString("auth-token", "");
+        Log.d("token", token);
+
         stores = new ArrayList<>();
-        Store meijer = new Store( "Meijer", findAddress(43.48273485750115, -83.9825981015855),43.48273485750115, -83.9825981015855);
-        Store bestBuy = new Store("Best Buy",findAddress(43.472831468931524, -83.97255798905496), 43.472831468931524, -83.97255798905496);
-        Store meijer2 = new Store("Meijer", findAddress(43.58328401083199, -83.83878854560731),43.58328401083199, -83.83878854560731);
-        Store staples = new Store("Staples",findAddress(43.623929085147914, -83.91255452520612), 43.623929085147914, -83.91255452520612);
-        stores.add(meijer);
-        stores.add(bestBuy);
-        stores.add(meijer2);
-        stores.add(staples);
+        HashMap<Integer, Store> storeMap = new HashMap<>();
+        items = new HashMap<>();
+        masterList = new ArrayList<>();
+
+        JsonArrayRequest stockedItemsRequest = new JsonArrayRequest(Request.Method.GET, "https://fast-ocean-54669.herokuapp.com/item_stock/",null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject stockedItem = response.getJSONObject(i);
+                        Item item = items.get(stockedItem.getJSONObject("item").getInt("id"));
+                        Store store = storeMap.get(stockedItem.getJSONObject("store").getInt("id"));
+
+                        StockedItem si = new StockedItem(item, store, stockedItem.getInt("stock"),LocalDateTime.parse(stockedItem.getString("last_update"), DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+                        masterList.add(si);
+                    } catch (JSONException e) {
+                        Log.d("ItemRequest", e.getLocalizedMessage());
+                    }
+                }
+
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+        },  new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ERROR", error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Authorization", token);
+                return params;
+            }
+        };
+
+        JsonArrayRequest itemsRequest = new JsonArrayRequest(Request.Method.GET, "https://fast-ocean-54669.herokuapp.com/items/",null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject item = response.getJSONObject(i);
+                        items.put(item.getInt("id"), new Item(item.getInt("id"),item.getString("item_name"), item.getString("item_description"), item.getDouble("item_price")));
+                    } catch (JSONException e) {
+                        Log.d("ItemRequest", e.getLocalizedMessage());
+                    }
+                }
+                RequestManager.getInstance(getApplicationContext()).addToRequestQueue(stockedItemsRequest);
+            }
+        },  new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ERROR", error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Authorization", token);
+                return params;
+            }
+        };
+
+        JsonArrayRequest storesRequest = new JsonArrayRequest(Request.Method.GET, "https://fast-ocean-54669.herokuapp.com/stores/",null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject store = response.getJSONObject(i);
+                        Store s = new Store(store.getInt("id"),store.getString("store_name"), store.getString("address"), store.getDouble("lat"), store.getDouble("lon"));
+                        stores.add(s);
+                        storeMap.put(s.id, s);
+                    } catch (JSONException e) {
+                        Log.d("StoresRequest", e.getLocalizedMessage());
+                    }
+                }
+                RequestManager.getInstance(getApplicationContext()).addToRequestQueue(itemsRequest);
+            }
+        },  new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ERROR", error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Authorization", token);
+                return params;
+            }
+        };
+        RequestManager.getInstance(this).addToRequestQueue(storesRequest);
+
         //add some random stock
         Item ps5 = new Item("Sony PlayStation 5", "Gaming console", 500.00);
         Item xboxx = new Item("Xbox Series X", "Gaming console", 500.0);
         Item stapler = new Item("Stapler idk", "??", 5.00);
         //and random stock to stores
-        masterList = new ArrayList<>();
-        masterList.add(new StockedItem(ps5, bestBuy, 10, LocalDateTime.now()));
-        masterList.add(new StockedItem(xboxx, meijer, 1, LocalDateTime.now()));
-        masterList.add(new StockedItem(stapler, staples, 105, LocalDateTime.now()));
-        masterList.add(new StockedItem(xboxx, bestBuy, 13, LocalDateTime.now()));
-
 
         //checking permissions for using gps and get the location
         //this can't be in the maps activity bc it doesn't execute in time
@@ -76,12 +182,13 @@ public class MainActivity extends AppCompatActivity {
         getUserLocation();
     }
 
-    public void launchMaps(View v){
+    public void launchMaps(View v) {
         Intent i = new Intent(this, MapsActivity.class);
         i.putExtra("stores", stores);
         i.putExtra("stock", masterList);
         i.putExtra("userLat", userLat);
         i.putExtra("userLon", userLon);
+        i.putExtra("items", items);
         startActivity(i);
     }
 
@@ -128,9 +235,8 @@ public class MainActivity extends AppCompatActivity {
                             //Set lat and lon values to the location lat and long
                             userLat = location.getLatitude();
                             userLon = location.getLongitude();
-                            Log.d("beata-debug", "Loc: "+userLat + " " + userLon);
-                        }
-                        else{
+                            Log.d("beata-debug", "Loc: " + userLat + " " + userLon);
+                        } else {
                             Log.d("beata-debug", "Could not get location");
                             //set to SVSU by default
                             userLat = 43.513583032256754;
